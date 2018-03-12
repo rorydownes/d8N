@@ -1,20 +1,22 @@
 const express = require('express');
 const path = require('path');
-const favicon = require('serve-favicon');
 const logger = require('morgan');
-const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+
+require('dotenv').load();
+const mongoDB = require('./mongoDB');
+mongoDB(); 
 
 const users = require('./routes/users');
 
 const app = express();
+const { SERVER_PORT } = process.env;
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: false
 }));
-app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api/users', users);
@@ -36,5 +38,5 @@ app.use(function (err, req, res, next) {
   });
 });
 
-app.listen(3000);
-console.log("Listening on 3000");
+app.listen(SERVER_PORT);
+console.log(`Listening on ${SERVER_PORT}`);

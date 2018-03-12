@@ -1,18 +1,29 @@
-var express = require('express');
-var router = express.Router();
+const Joi = require('joi');
+const router = require('express-promise-router')();
+const { validateRequest } = require('../validation');
 
-const user = {
-    first: 'Rory',
-    last: 'Downes',
-    phone: '347-777-4777',
-    zip: '11217'
+const UserController = require('../controllers/UserController');
+
+const identifyUserSchema = {
+    email: Joi.string().email().required(),
+    password: Joi.string().required(),
 };
 
-router.get('/', function(req, res, next) {
-    res.status(200);
-    res.json({
-        users: [user]
-    });
-});
+const createUserSchema = {
+    ...identifyUserSchema,
+    first: Joi.string(),
+    last: Joi.string(),
+    phone: Joi.string(),
+    zip: Joi.string(),
+};
+
+router.route('/')
+    .get(UserController.listUsers)
+    .post(validateRequest(createUserSchema), UserController.signup)
+    .put(UserController.updateUser)
+    .delete(UserController.deleteUser);
+
+router.route('/login')
+    .post(validateRequest(identifyUserSchema), UserController.login);
 
 module.exports = router;
