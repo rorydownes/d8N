@@ -1,16 +1,29 @@
+const fs = require('fs');
+var https = require('https');
+var http = require('http');
 const express = require('express');
 const path = require('path');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
 
 require('dotenv').load();
-const mongoDB = require('./mongoDB');
+
+const mongoDB = require('./config/mongo');
 mongoDB(); 
 
-const users = require('./routes/users');
+const Authentication = require('./config/auth');
+Authentication();
 
 const app = express();
-const { SERVER_PORT } = process.env;
+const users = require('./routes/users');
+
+const {
+  HTTP_SERVER_PORT,
+  HTTPS_KEY_FILE_PATH,
+  HTTPS_CERT_FILE_PATH,
+  HTTPS_SERVER_PORT,
+  HTTPS_ENABLED
+} = process.env;
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
@@ -38,5 +51,16 @@ app.use(function (err, req, res, next) {
   });
 });
 
-app.listen(SERVER_PORT);
-console.log(`Listening on ${SERVER_PORT}`);
+http.createServer(app).listen(HTTP_SERVER_PORT);
+console.log(`Listening on ${HTTP_SERVER_PORT}`);
+
+if (HTTPS_ENABLED.toLowerCase() === 'true') {
+  if (HTTPS_KEY_FILE_PATH && HTTPS_CERT_FILE_PATH) {
+    https.createServer({
+      key: fs.readFileSync(HTTPS_KEY_FILE_PATH),
+      cert: fs.readFileSync(HTTPS_CERT_FILE_PATH)
+    }, app).listen(HTTPS_SERVER_PORT);
+  } else {
+    console.error('KEY FILE & CERT_FILE required for HTTPS_ENABLED');
+  }
+}
