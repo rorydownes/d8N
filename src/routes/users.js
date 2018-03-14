@@ -1,7 +1,8 @@
 const Joi = require('joi');
-const router = require('express-promise-router')();
+const express = require('express');
+const router = express.Router();
 const { validateRequest } = require('../validation');
-const { JWTRequired } = require('../utils/routeHelpers');
+const { TokenRequired, LocalLoginRequired } = require('../utils/routeHelpers');
 
 const UserController = require('../controllers/UserController');
 
@@ -19,12 +20,12 @@ const createUserSchema = {
 };
 
 router.route('/')
-    .get(JWTRequired, UserController.listUsers)
+    .get(TokenRequired, UserController.listUsers)
     .post(validateRequest(createUserSchema), UserController.signup)
-    .put(JWTRequired, UserController.updateUser)
+    .put(TokenRequired, UserController.updateUser)
     .delete(UserController.deleteUser);
 
 router.route('/login')
-    .post(validateRequest(identifyUserSchema), UserController.login);
+    .post(validateRequest(identifyUserSchema), LocalLoginRequired, UserController.login);
 
 module.exports = router;

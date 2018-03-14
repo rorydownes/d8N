@@ -36,7 +36,7 @@ const signup = async(req, res, next) => {
 
         if (!saveErr) {
             const token = signToken(newUser);
-            res.status(200).json({ user: newUser, token });
+            res.status(200).json({ "access-token": token });
         }
     } catch(error) {
         res.status(500).json({ error })
@@ -45,7 +45,7 @@ const signup = async(req, res, next) => {
 
 const login = async(req, res, next) => {
     const token = signToken(req.user);
-    res.status(200).json({ user: req.user, token });
+    res.status(200).json({ "access-token": token });
 };
 
 const updateUser = (req, res, next) => {

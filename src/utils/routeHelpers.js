@@ -1,7 +1,10 @@
 const passport = require('passport');
 
-const JWTRequired = passport.authenticate('jwt', { session: false });
+const noSession = { session: false };
+const TokenRequired = passport.authenticate('jwt', noSession);
+const LocalLoginRequired = passport.authenticate('local', noSession);
 
 module.exports = {
-    JWTRequired,
+    TokenRequired,
+    LocalLoginRequired
 };
