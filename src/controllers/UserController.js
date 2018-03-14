@@ -7,7 +7,7 @@ const signToken = user => {
         iss: JWT_ISSUER,
         sub: user.id,
         iat: new Date().getTime(),
-        exp: new Date().setDate(new Date().getDate() + 7) // current time + 7 days ahead
+        exp: new Date().setDate(new Date().getDate() + 7)
     }, JWT_SECRET);
 };
 
@@ -36,26 +36,16 @@ const signup = async(req, res, next) => {
 
         if (!saveErr) {
             const token = signToken(newUser);
-            res.status(200).json({ user: newUser, token });
+            res.status(200).json({ "access-token": token });
         }
     } catch(error) {
-        console.error(error);
         res.status(500).json({ error })
     }
 };
 
 const login = async(req, res, next) => {
-    const requestBody = req.validated.body;
-    const { email, password } = requestBody;
-    const foundUser = await UserModel.findOne({ email });
-        
-    if (!foundUser || foundUser.password != password) {
-        res.status(200).json({ error: 'User with those credentials not found'});
-        return;
-    }
-
-    const token = signToken(foundUser);
-    res.status(200).json({ user: foundUser, token });
+    const token = signToken(req.user);
+    res.status(200).json({ "access-token": token });
 };
 
 const updateUser = (req, res, next) => {

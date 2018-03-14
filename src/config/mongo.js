@@ -4,8 +4,6 @@ module.exports = function() {
     const { MONGO_HOST, MONGO_PORT, MONGO_DB_NAME} = process.env;
     const connectionURI = `mongodb://${MONGO_HOST}:${MONGO_PORT}/${MONGO_DB_NAME}`;
 
-    console.log(connectionURI);
-
     mongoose.connect(connectionURI);
 
     var db = mongoose.connection;
